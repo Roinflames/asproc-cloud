@@ -1,5 +1,4 @@
 # Qi geqi
-
 ## 1
 División de transporte 
 Pago de subsidios
@@ -16,7 +15,6 @@ Gran cantidad de información
 Operador carga archivo / Validación / Carga a tabla Oracle particionada
 2015, Villarica y Castro, 60 buses
 Aumento de 60GB mensuales
-
 ## Pago subsidios
 Análisis de información de pagos y hacer proyección
 Zoom a nivel de ejecutivo
@@ -59,3 +57,6 @@ Estandar de seguridad
 Promocionar nuevas tecnologías
 Herramientas Microsoft
 ASP.net
+
+Buses: Para todos menos Santiago
+Aplicación red de regiones.
