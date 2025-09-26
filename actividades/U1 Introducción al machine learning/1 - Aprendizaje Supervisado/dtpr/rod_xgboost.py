@@ -1,7 +1,8 @@
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
 import os # Importamos os para manejar rutas de archivo de forma robusta
 
 # --- Definición de Constantes y Rutas ---
@@ -10,7 +11,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 TRAIN_FILE_PATH = os.path.join(SCRIPT_DIR, "data", "train.csv")
 TEST_FILE_PATH = os.path.join(SCRIPT_DIR, "data", "test.csv")
 RECAUDO_FILE_PATH = os.path.join(SCRIPT_DIR, "data", "recaudo.csv")
-SUBMISSION_FILE_PATH = os.path.join(SCRIPT_DIR, "submission.csv")
+SUBMISSION_FILE_PATH = os.path.join(SCRIPT_DIR, "submission_xgboost.csv")
 
 # Problema de clasificación multiclase.
 """
@@ -87,22 +88,38 @@ def train_and_evaluate_model(df):
     X = df[FEATURES]
     y = df[TARGET]
 
+    # Codificar la variable objetivo (target) para que empiece en 0
+    le = LabelEncoder()
+    y_encoded = le.fit_transform(y)
+    num_class = len(le.classes_)
+
     # Dividir los datos en entrenamiento y validación (80% para entrenar, 20% para validar)
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
     print(f"Datos divididos: {len(X_train)} para entrenamiento, {len(X_val)} para validación.")
     
-    clf = RandomForestClassifier(n_estimators=100, random_state=42, verbose=1)
+    # Instanciar el clasificador XGBoost
+    clf = xgb.XGBClassifier(
+        objective='multi:softmax', 
+        num_class=num_class, 
+        n_estimators=100, 
+        random_state=42, 
+        use_label_encoder=False, 
+        eval_metric='mlogloss'
+    )
     
     # Entrenar el modelo
-    print("Entrenando el modelo RandomForest...")
+    print("Entrenando el modelo XGBoost...")
     clf.fit(X_train, y_train)
     
     # --- Evaluación del Modelo ---
     # Hacemos predicciones en el conjunto de validación (datos que el modelo no ha visto)
-    predictions = clf.predict(X_val)
+    predictions_encoded = clf.predict(X_val)
+
+    # Decodificar las predicciones para calcular la precisión con las etiquetas originales si es necesario
+    # predictions = le.inverse_transform(predictions_encoded)
 
     # Calculamos la precisión (accuracy)
-    accuracy = accuracy_score(y_val, predictions)
+    accuracy = accuracy_score(y_val, predictions_encoded)
 
     print("-" * 30)
     print("Paso 4: Evaluación del modelo")
@@ -111,9 +128,9 @@ def train_and_evaluate_model(df):
     print("Un valor más alto es mejor. Nos da una idea de cómo se comportará el modelo con datos nuevos.")
     print("-" * 30)
 
-    return clf
+    return clf, le
 
-def generate_submission_file(model, test_df, submission_path):
+def generate_submission_file(model, test_df, submission_path, label_encoder):
     """
     Genera el archivo de submission.
     """
@@ -123,7 +140,10 @@ def generate_submission_file(model, test_df, submission_path):
     X_test = test_df[FEATURES]
 
     # Realizar predicciones
-    test_predictions = model.predict(X_test)
+    test_predictions_encoded = model.predict(X_test)
+    
+    # Decodificar las predicciones para tener las etiquetas originales (1, 2, 3)
+    test_predictions = label_encoder.inverse_transform(test_predictions_encoded)
 
     # Crear el DataFrame para el archivo de submission
     output = pd.DataFrame({
@@ -146,9 +166,9 @@ def main():
     # 2. Preprocesar datos
     train_processed, test_processed = preprocess_data(train_df, test_df)
     # 3. Entrenar y evaluar el modelo (usando solo los datos de entrenamiento procesados)
-    trained_model = train_and_evaluate_model(train_processed)
+    trained_model, label_encoder = train_and_evaluate_model(train_processed)
     # 4. Generar el archivo de predicciones (usando el modelo entrenado y los datos de prueba procesados)
-    # generate_submission_file(trained_model, test_processed, SUBMISSION_FILE_PATH)
+    generate_submission_file(trained_model, test_processed, SUBMISSION_FILE_PATH, label_encoder)
     print("\nProceso completado.")
 
 if __name__ == "__main__":
