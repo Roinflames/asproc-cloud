@@ -1,0 +1,289 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# U1 - Aprendizaje Supervisado: El Desafío del Titanic\n",
+    "\n",
+    "**Objetivo:** En este notebook, construiremos un modelo de Machine Learning para resolver uno de los desafíos más famosos: predecir qué pasajeros sobrevivieron al hundimiento del Titanic.\n",
+    "\n",
+    "**El Concepto Clave: Clasificación Supervisada**\n",
+    "\n",
+    "Lo que haremos es un ejemplo de `clasificación supervisada`. La idea es simple y la podemos entender con una analogía:\n",
+    "\n",
+    "Imagina que le enseñas a un niño a reconocer frutas. Le muestras una manzana (`dato`) y le dices \"esto es una manzana\" (`etiqueta`). Haces lo mismo con muchas frutas. El niño aprende los patrones (rojo y redondo es manzana, amarillo y curvo es plátano). Eventualmente, cuando le muestras una fruta nueva, puede adivinar correctamente. \n",
+    "\n",
+    "Nosotros haremos lo mismo: le mostraremos a nuestro modelo los datos de muchos pasajeros (`dato`) y le diremos si sobrevivieron o no (`etiqueta`). El modelo aprenderá los patrones y luego lo usaremos para predecir la supervivencia de pasajeros que nunca ha visto."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 1: Importar las Librerías\n",
+    "\n",
+    "Empezamos por cargar las herramientas que necesitaremos:\n",
+    "- `pandas`: Para cargar y manipular nuestros datos (los archivos CSV).\n",
+    "- `sklearn`: La librería de Machine Learning más popular de Python. De aquí usaremos el modelo (`RandomForestClassifier`) y varias utilidades."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.metrics import accuracy_score\n",
+    "import os"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 2: Cargar Nuestros Datos\n",
+    "\n",
+    "Ahora, vamos a cargar los datos de los pasajeros desde los archivos `train.csv` y `test.csv`. El archivo `train.csv` contiene tanto las características de los pasajeros como la información de si sobrevivieron o no (nuestros ejemplos etiquetados). El archivo `test.csv` solo tiene las características; nuestro trabajo es predecir la supervivencia para estos."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Construimos las rutas a los archivos de forma robusta\n",
+    "TRAIN_FILE_PATH = os.path.join(\"titanic\", \"train.csv\")\n",
+    "TEST_FILE_PATH = os.path.join(\"titanic\", \"test.csv\")\n",
+    "\n",
+    "# Cargamos los datos usando pandas\n",
+    "train_df = pd.read_csv(TRAIN_FILE_PATH)\n",
+    "test_df = pd.read_csv(TEST_FILE_PATH)\n",
+    "\n",
+    "# ¡Un paso crucial! Siempre mira cómo se ven tus datos\n",
+    "print(\"Muestra de los datos de entrenamiento:\")\n",
+    "train_df.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 3: Preprocesamiento y Limpieza de Datos\n",
+    "\n",
+    "Los modelos de Machine Learning no entienden de texto (como 'male' o 'female') y no les gustan los datos faltantes. Así que tenemos que hacer una pequeña limpieza.\n",
+    "\n",
+    "1.  **Convertir 'Sex' a números:** Mapearemos 'male' a `0` y 'female' a `1`.\n",
+    "2.  **Manejar 'Age' faltante:** La columna 'Age' tiene valores vacíos. Una estrategia común es rellenar esos huecos con el valor de la mediana de edad de todos los pasajeros. \n",
+    "    *Nota importante:* Calculamos la mediana usando **solo los datos de entrenamiento** y aplicamos ese mismo valor tanto al conjunto de entrenamiento como al de prueba. Esto previene la \"fuga de datos\" (data leakage), que es como darle pistas al modelo sobre los datos de prueba antes de tiempo."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Convertir 'Sex' a 0 y 1\n",
+    "sex_mapping = {'male': 0, 'female': 1}\n",
+    "train_df['Sex'] = train_df['Sex'].map(sex_mapping)\n",
+    "test_df['Sex'] = test_df['Sex'].map(sex_mapping)\n",
+    "\n",
+    "# Rellenar valores faltantes en 'Age'\n",
+    "median_age = train_df['Age'].median()\n",
+    "print(f\"La edad mediana para rellenar valores es: {median_age:.2f}\")\n",
+    "\n",
+    "train_df['Age'] = train_df['Age'].fillna(median_age)\n",
+    "test_df['Age'] = test_df['Age'].fillna(median_age)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 4: Seleccionar Nuestras Características (Features)\n",
+    "\n",
+    "No usaremos todas las columnas para entrenar al modelo. Empezaremos con un conjunto simple de características que creemos que podrían ser importantes para predecir la supervivencia.\n",
+    "\n",
+    "- `Pclass`: La clase del pasajero (1ra, 2da, 3ra).\n",
+    "- `Sex`: El sexo del pasajero (que ya convertimos a 0 y 1).\n",
+    "- `Age`: La edad del pasajero."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "FEATURES = ['Pclass', 'Sex', 'Age']\n",
+    "TARGET = 'Survived'\n",
+    "\n",
+    "# Separamos las características (X) y nuestro objetivo (y) del conjunto de entrenamiento\n",
+    "X_train_full = train_df[FEATURES]\n",
+    "y_train_full = train_df[TARGET]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 5: Dividir los Datos para una Evaluación Honesta (Train-Validation Split)\n",
+    "\n",
+    "Este es uno de los conceptos más importantes. **Nunca debemos evaluar nuestro modelo con los mismos datos que usamos para entrenarlo.** Sería como si un profesor les diera las preguntas y respuestas de un examen para estudiar; ¡no sería una prueba justa de su conocimiento!\n",
+    "\n",
+    "Por eso, dividimos nuestro `train_df` en dos partes:\n",
+    "1.  Un **conjunto de entrenamiento** más grande (80% de los datos) que usaremos para que el modelo aprenda.\n",
+    "2.  Un **conjunto de validación** más pequeño (20%) que mantendremos oculto. Lo usaremos al final para simular cómo se comporta el modelo con datos que no ha visto antes."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Usamos train_test_split para hacer la división\n",
+    "# random_state=42 asegura que la división sea siempre la misma, para que nuestros resultados sean reproducibles\n",
+    "X_train, X_val, y_train, y_val = train_test_split(\n",
+    "    X_train_full, y_train_full, test_size=0.2, random_state=42)\n",
+    "\n",
+    "print(f\"Datos para entrenar: {len(X_train)} filas\")\n",
+    "print(f\"Datos para validar: {len(X_val)} filas\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 6: Entrenar Nuestro Modelo de Clasificación\n",
+    "\n",
+    "¡Llegó el momento de entrenar! Usaremos un modelo llamado `RandomForestClassifier`. \n",
+    "\n",
+    "Puedes pensar en él como un 'comité de expertos'. En lugar de confiar en un solo 'árbol de decisión', el bosque aleatorio crea muchos árboles, cada uno con una visión ligeramente diferente de los datos. Para hacer una predicción, todos los árboles 'votan', y la decisión de la mayoría es la predicción final. Esto hace que el modelo sea mucho más robusto y preciso."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Inicializamos el modelo\n",
+    "model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+    "\n",
+    "# ¡El entrenamiento en sí es solo una línea de código!\n",
+    "model.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 7: Evaluar el Rendimiento del Modelo\n",
+    "\n",
+    "Ahora que el modelo está entrenado, vamos a probar qué tan bien funciona. Usaremos el conjunto de validación (`X_val`), que el modelo nunca ha visto.\n",
+    "\n",
+    "La métrica que usaremos es la **precisión (accuracy)**, que simplemente mide el porcentaje de predicciones correctas."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Hacemos predicciones en el conjunto de validación\n",
+    "predictions = model.predict(X_val)\n",
+    "\n",
+    "# Calculamos la precisión\n",
+    "accuracy = accuracy_score(y_val, predictions)\n",
+    "\n",
+    "print(f\"Precisión (Accuracy) en el conjunto de validación: {accuracy:.2%}\")\n",
+    "print(\"Explicación: Este valor representa el porcentaje de predicciones correctas que hizo el modelo sobre datos que no usó para aprender.")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 8: ¡Actividad Práctica!\n",
+    "\n",
+    "Actualmente, nuestro modelo usa las características `['Pclass', 'Sex', 'Age']`. ¿Qué pasaría si añadiéramos otra característica?\n",
+    "\n",
+    "**Tu desafío:** Intenta añadir la columna `'Fare'` (la tarifa que pagó el pasajero) a la lista de `FEATURES`. ¿La precisión del modelo mejora o empeora? ¿Por qué crees que ocurre esto?\n",
+    "\n",
+    "Copia y adapta el código de los pasos 4 a 7 en la celda de abajo para experimentar. No te preocupes si te equivocas, ¡experimentar es la mejor forma de aprender!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Tu código aquí. ¡Inténtalo!\n",
+    "# 1. Define una nueva lista de FEATURES que incluya 'Fare'\n",
+    "# 2. Vuelve a crear X_train_full y y_train_full con las nuevas features\n",
+    "# 3. Vuelve a hacer el train_test_split\n",
+    "# 4. Entrena un nuevo modelo\n",
+    "# 5. Evalúa y muestra la nueva precisión"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Paso 9: Generar el Archivo para Kaggle\n",
+    "\n",
+    "Una vez que estamos satisfechos con nuestro modelo, el último paso es usarlo para predecir la supervivencia de los pasajeros en el archivo `test.csv` y guardar los resultados en el formato que pide la competencia de Kaggle."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Asegurarse de que el DataFrame de prueba tenga las mismas columnas que se usaron para entrenar\n",
+    "X_test = test_df[FEATURES]\n",
+    "\n",
+    "# Realizar predicciones\n",
+    "test_predictions = model.predict(X_test)\n",
+    "\n",
+    "# Crear el DataFrame para el archivo de submission\n",
+    "output = pd.DataFrame({'PassengerId': test_df.PassengerId, 'Survived': test_predictions})\n",
+    "\n",
+    "# Guardar el archivo en formato CSV\n",
+    "output.to_csv(\"submission.csv\", index=False)\n",
+    "\n",
+    "print(\"Archivo 'submission.csv' generado con éxito.\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

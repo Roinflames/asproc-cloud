@@ -1,0 +1,12 @@
+ID,value
+cluster0_center_x,-0.6
+cluster0_center_y,-0.56
+cluster1_center_x,1.18
+cluster1_center_y,1.18
+cluster2_center_x,-0.58
+cluster2_center_y,-0.62
+inertia,2099.84
+silhouette_score,0.31
+cluster0_size,345.0
+cluster1_size,333.0
+cluster2_size,322.0
