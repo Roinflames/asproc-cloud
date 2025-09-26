@@ -35,7 +35,7 @@ MEDIO_ACCESO
 LATITUDE_USO	
 LONGITUDE_USO
 """
-FEATURES = ['MONTO_TRANSACCION', 'MEDIO_ACCESO', 'LATITUDE_USO', 'LONGITUDE_USO']
+FEATURES = ['MEDIO_ACCESO', 'LATITUDE_USO', 'LONGITUDE_USO']
 TARGET = 'TIPO_TARIFA'
 
 def load_data(train_path, test_path):
@@ -44,19 +44,9 @@ def load_data(train_path, test_path):
     """
     print("Paso 1: Cargando datos...")
     try:
-        # train_df = pd.read_csv(train_path, sep=";", encoding="utf-8")
-        # test_df = pd.read_csv(test_path, sep=";", encoding="utf-8")
-        # print("Datos cargados exitosamente.")
-        # return train_df, test_df
-        # Cargar dataset completo
-        df = pd.read_csv(TRAIN_FILE_PATH, sep=";", encoding="utf-8")
-
-        # Calcular el índice de corte
-        split_index = int(len(df) * 0.8)
-
-        # Dividir en 80% train y 20% test
-        train_df = df.iloc[:split_index].copy()
-        test_df = df.iloc[split_index:].copy()
+        train_df = pd.read_csv(train_path, sep=";", encoding="utf-8")
+        test_df = pd.read_csv(test_path, sep=";", encoding="utf-8")
+        print("Datos cargados exitosamente.")
         return train_df, test_df
     except FileNotFoundError as e:
         print(f"Error: No se encontró el archivo. Asegúrate de que los archivos CSV estén en la ruta correcta: {e}")
@@ -69,23 +59,25 @@ def preprocess_data(train_df, test_df):
     Preprocesa los datos para el modelo.
     - Convierte latitud y longitud a float.
     - Maneja valores faltantes.
+    - Elimina TIPO_TARIFA en el test set.
     """
     train_df_processed = train_df.copy()
     test_df_processed = test_df.copy()
 
     # --- Conversión de LAT y LONG ---
     for df in [train_df_processed, test_df_processed]:
-        # Reemplazar coma por punto y convertir a float
         df["LATITUDE_USO"] = df["LATITUDE_USO"].astype(str).str.replace(",", ".", regex=False).astype(float)
         df["LONGITUDE_USO"] = df["LONGITUDE_USO"].astype(str).str.replace(",", ".", regex=False).astype(float)
 
-        # Si hay valores faltantes, los rellenamos con la mediana
         df["LATITUDE_USO"].fillna(df["LATITUDE_USO"].median(), inplace=True)
         df["LONGITUDE_USO"].fillna(df["LONGITUDE_USO"].median(), inplace=True)
 
-    print("Datos preprocesados (lat/long convertidos a float).")
-    return train_df_processed, test_df_processed
+    # --- Eliminar columna objetivo en test ---
+    if TARGET in test_df_processed.columns:
+        test_df_processed = test_df_processed.drop(columns=[TARGET])
 
+    print("Datos preprocesados (lat/long convertidos a float, test sin target).")
+    return train_df_processed, test_df_processed
 
 def train_and_evaluate_model(df):
     """
