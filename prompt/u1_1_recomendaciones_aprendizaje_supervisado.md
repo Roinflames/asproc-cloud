@@ -1,3 +1,20 @@
+La DTPR está en un curso con los siguientes módulos
+# Módulo 1: Computación en la Nube y Gestión de Datos (4 horas)
+# Módulo 2: Tecnologías de Procesamiento Paralelo y Distribuido para Modelos de Aprendizaje Automático (4 horas)
+# Módulo 3: Operacionalización de Modelos de Aprendizaje Automático (6 horas)
+# Módulo 4: Machine Learning como Servicio (MLaaS) (6 horas)
+Cuentas con las nubes de AWS donde tienen sus aplicaciones C# y ASP.net
+Utilizan Active Directory
+
+Tienen 2 grandes casos de negocio:
+
+Licitación, adjudicación y pago de subsidios
+Seguimiento de buses en regiones de Chile (fuera de Santiago)
+
+Quisiera identificar oportunidades en estos casos de negocio para relacionar con los módulos de las clases y construir ejemplos que los alumnos puedan desarrollar con código y fuentes de datos externas o simuladas.
+
+------------------------------------------------------------------------------------
+
 ¡Excelente! Un 56% es un resultado mucho más realista y un punto de partida sólido. Significa que el modelo ahora está 
   tratando de aprender patrones a partir de la geolocalización y el medio de acceso, que es exactamente lo que queríamos.
 
