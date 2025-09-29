@@ -16,8 +16,8 @@ Este módulo sienta las bases para trabajar con grandes volúmenes de datos en e
 
 # Módulo 2: Tecnologías de Procesamiento Paralelo y Distribuido para Modelos de Aprendizaje Automático (4 horas)
 Este módulo se centra en las herramientas y técnicas necesariapara entrenar modelos de machine learning de manera eficiente con grandes conjuntos de datos.
-☑️ Introducción al Procesamiento Paralelo y Distribuido.
-☑️ Conceptos de paralelismo y distribución.
+✅ Introducción al Procesamiento Paralelo y Distribuido.
+✅ Conceptos de paralelismo y distribución.
 ☑️ Ventajas y desafíos del procesamiento distribuido.
 ☑️ Arquitecturas de cluster para machine learning.
 ☑️ Apache Spark para Machine Learning.
