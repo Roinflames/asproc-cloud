@@ -8,6 +8,7 @@
 python -m venv %USERPROFILE%\oci-cli-venv
 %USERPROFILE%\oci-cli-venv\Scripts\activate
 pip install oci-cli
+oci --version
 ```
 # 🔹 2. Configurar la CLI
 ```bash
