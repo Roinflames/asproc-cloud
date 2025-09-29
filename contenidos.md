@@ -5,8 +5,8 @@ Este módulo sienta las bases para trabajar con grandes volúmenes de datos en e
 ✅ Modelos de despliegue: nube pública, privada, híbrida.
 ✅ Proveedores de servicios en la nube principales (AWS, Azure, Google Cloud): introducción a sus servicios de cómputy almacenamiento.
 ✅ Consideraciones de seguridad y costos en la nube.
-☑️ Almacenamiento y Bases de Datos en la Nube (Tipos de almacenamiento en la nube: Object Storage (S3, Azure Blob Storage), Block Storage, File Storage).
-☑️ Bases de datos relacionales en la nube (RDS, Azure SQDatabase, Cloud SQL).
+✅ Almacenamiento y Bases de Datos en la Nube (Tipos de almacenamiento en la nube: Object Storage (S3, Azure Blob Storage), Block Storage, File Storage).
+✅ Bases de datos relacionales en la nube (RDS, Azure SQDatabase, Cloud SQL).
 ☑️ Bases de datos NoSQL en la nube (DynamoDB, Cosmos DB, Firestore): casos de uso y diferencias.
 ☑️ Herramientas para la ingesta y transformación de dato(ETL/ELT) en la nube.
 ☑️ Gestión de Datos y Data Lakes.
@@ -27,7 +27,7 @@ Este módulo se centra en las herramientas y técnicas necesariapara entrenar mo
 ☑️ Entrenamiento de modelos distribuidos con Spark.
 ☑️ Optimización de rendimiento en Spark.
 ☑️ Otras Tecnologías Distribuidas.
-☑️ Introducción a Dask para cómputo paralelo en Python.
+✅ Introducción a Dask para cómputo paralelo en Python.
 ☑️ TensorFlow Distributed y PyTorch Distributed para entrenamiento de deep learning distribuido.
 ☑️ Conceptos de GPU computing para acelerar el entrenamiento de modelos.
 

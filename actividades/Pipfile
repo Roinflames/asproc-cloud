@@ -17,6 +17,7 @@ boto3 = "*"
 requests = "*"
 xgboost = "*"
 lightgbm = "*"
+pyspark = "*"
 
 [dev-packages]
 
