@@ -1,6 +1,9 @@
 select table_name
   from user_tables;
 
+select *
+  from user_tables;
+
 select column_name,
        data_type,
        data_length
@@ -34,6 +37,9 @@ insert into nueva_tabla (
 -- Consultar datos de la nueva tabla
 select *
   from nueva_tabla;
+
+select *
+  from jom_test;
 
 -- Eliminar una tabla
 drop table nueva_tabla;

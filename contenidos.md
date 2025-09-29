@@ -37,7 +37,7 @@ Este módulo cubre el ciclo de vida completo de un modelo de machine learning, d
 ☑️ Definición y principios de MLOps.
 ☑️ Ciclo de vida del MLOps: experimentación, desarrollo, despliegue, monitoreo.
 ☑️ Herramientas para el seguimiento de experimentos y versiones de modelos (MLflow, DVC).
-☑️ Despliegue de Modelos de Machine Learning.
+✅ Despliegue de Modelos de Machine Learning.
 ☑️ Creación de APIs para modelos: Flask, FastAPI.
 ☑️ Contenedorización de modelos con Docker.
 ☑️ Despliegue en la nube: serverless functions (Lambda, Azure Functions, Cloud Functions), servicios de contenedores (ECS, AKS, GKE).
