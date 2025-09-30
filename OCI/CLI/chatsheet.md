@@ -7,6 +7,7 @@
 ```bash
 python -m venv %USERPROFILE%\oci-cli-venv
 %USERPROFILE%\oci-cli-venv\Scripts\activate
+cd c:\Projects\ASPROC\asproc-cloud
 pip install oci-cli
 oci --version
 ```

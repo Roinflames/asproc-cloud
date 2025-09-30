@@ -1,0 +1,1 @@
+En el directorio raíz está el archivo contenidos.md. Lo que tiene ✅ son contenidos que ya revisamos en clases. Lo que tiene ☑️ son contenidos que no revisamos en clases. Considerando que ya hemos utilizado 12 horas de 20 y que queda la clase 4 y 5, ¿Cuál es el contenido ideal para revisar en la clase que sigue? ¿Ejemplos en código para la clase?

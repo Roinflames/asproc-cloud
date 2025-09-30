@@ -18,8 +18,8 @@ requests = "*"
 xgboost = "*"
 lightgbm = "*"
 pyspark = "*"
-dask = "*"
 pyarrow = "*"
+dask = "*"
 
 [dev-packages]
 
