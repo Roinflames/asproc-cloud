@@ -1,0 +1,122 @@
+# 🔹 1. ¿Qué es Apache Spark?
+
+Apache Spark es un framework de procesamiento distribuido de datos en clúster, diseñado para ser rápido y tolerante a fallos.
+Permite trabajar con Big Data en memoria, a diferencia de Hadoop MapReduce (que escribe/lee mucho en disco).
+
+Usos principales:
+- Procesamiento batch (ETL masivos).
+- Procesamiento en streaming.
+- Machine Learning con MLlib.
+- Análisis SQL con SparkSQL.
+- Gráficos con GraphX.
+
+Se puede programar en Scala, Java, Python (PySpark) y R.
+
+# 🔹 2. Instalación de Apache Spark
+Dependiendo de tu entorno:
+
+🖥️ Instalación local (modo standalone)
+
+Requisitos previos
+
+Tener instalado Java (JDK 8 o superior)
+```bash
+java -version
+```
+Tener instalado Python 3.x si quieres usar PySpark.
+
+Instalar Scala (opcional, si vas a usar Spark en Scala).
+
+Descargar Spark
+Desde la página oficial: https://spark.apache.org/downloads.html
+
+Elige versión estable (ej: Spark 3.5.x).
+
+Selecciona pre-built for Hadoop (ej: Hadoop 3.3).
+
+Extraer e instalar
+```bash
+tar -xvf spark-3.5.0-bin-hadoop3.tgz
+mv spark-3.5.0-bin-hadoop3 /usr/local/spark
+```
+
+Configurar variables de entorno (ejemplo en Linux/Mac, en Windows se hace en Variables de Entorno):
+```bash
+export SPARK_HOME=/usr/local/spark
+export PATH=$SPARK_HOME/bin:$PATH
+```
+
+Probar instalación
+```bash
+spark-shell   # para usar Scala
+pyspark       # para usar Python
+```
+🐍 Instalación con PySpark (solo Python)
+
+Si no quieres descargar Spark manualmente, puedes instalar con pip:
+```bash
+pip install pyspark
+```
+
+Esto descarga Spark y Java embebido, suficiente para pruebas locales.
+
+☁️ Instalación en clúster
+
+Spark también se puede desplegar en:
+- YARN (Hadoop)
+- Kubernetes
+- Standalone cluster
+
+Pero eso ya es nivel avanzado.
+
+# 🔹 3. Uso básico de Spark
+
+Ejemplo con PySpark:
+```bash
+from pyspark.sql import SparkSession
+
+# Crear sesión de Spark
+spark = SparkSession.builder \
+    .appName("EjemploSpark") \
+    .getOrCreate()
+
+# Crear un DataFrame
+data = [("Rodrigo", 36), ("Joseline", 30), ("Juan", 25)]
+columns = ["Nombre", "Edad"]
+
+df = spark.createDataFrame(data, columns)
+
+# Operaciones
+df.show()
+df.filter(df["Edad"] > 30).show()
+
+# Usar SQL
+df.createOrReplaceTempView("personas")
+spark.sql("SELECT * FROM personas WHERE Edad > 30").show()
+
+spark.stop()
+```
+
+Salida esperada:
+
++--------+----+
+|  Nombre|Edad|
++--------+----+
+| Rodrigo|  36|
+|Joseline|  30|
+|    Juan|  25|
++--------+----+
+
++--------+----+
+|  Nombre|Edad|
++--------+----+
+| Rodrigo|  36|
++--------+----+
+
+# 🔹 4. Comandos útiles
+
+spark-shell → iniciar en Scala.
+
+pyspark → iniciar en Python.
+
+spark-submit script.py → ejecutar un script en Spark (local o clúster).
