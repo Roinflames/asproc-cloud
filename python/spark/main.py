@@ -1,6 +1,9 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
+# import findspark
+# findspark.init()
+
 # 1. Crear la sesión de Spark
 spark = SparkSession.builder \
     .appName("Ejemplo PySpark") \

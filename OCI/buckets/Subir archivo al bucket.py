@@ -11,8 +11,8 @@ namespace = "axmtlntfagbi"   # el que te apareció en la consulta
 bucket_name = "bucket-20250928-2036"
 
 # Archivo local y nombre en el bucket
-file_path = "ejemplo.txt"
-object_name = "ejemplo.txt"
+file_path = "main.py"
+object_name = "main.py"
 
 with open(file_path, "rb") as f:
     obj = object_storage.put_object(

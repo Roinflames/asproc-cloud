@@ -17,11 +17,11 @@ boto3 = "*"
 requests = "*"
 xgboost = "*"
 lightgbm = "*"
-pyspark = "*"
 pyarrow = "*"
 dask = "*"
+pyspark = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "3.11"

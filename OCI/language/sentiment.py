@@ -24,8 +24,10 @@ try:
     response = language_client.batch_detect_language_sentiments(
         batch_detect_language_sentiments_details=batch_details
     )
+    
+    print(response.data)
 
-    print("Resultados del Análisis de Sentimiento:")
+    # print("Resultados del Análisis de Sentimiento:")
     for doc in response.data.documents:
         if doc.aspects:
             aspect = doc.aspects[0]

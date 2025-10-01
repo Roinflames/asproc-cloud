@@ -1,3 +1,6 @@
+"""
+Computación distribuida y paralela con Dask
+"""
 import dask.dataframe as dd
 import pandas as pd
 
